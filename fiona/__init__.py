@@ -68,7 +68,6 @@ import os
 import sys
 import warnings
 
-from six import string_types
 from collections import OrderedDict
 
 try:
@@ -331,9 +330,9 @@ def listlayers(fp, vfs=None):
         if isinstance(fp, Path):
             fp = str(fp)
 
-        if not isinstance(fp, string_types):
+        if not isinstance(fp, str):
             raise TypeError("invalid path: %r" % fp)
-        if vfs and not isinstance(vfs, string_types):
+        if vfs and not isinstance(vfs, str):
             raise TypeError("invalid vfs: %r" % vfs)
 
         if vfs:

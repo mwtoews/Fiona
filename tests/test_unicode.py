@@ -35,12 +35,6 @@ class TestUnicodePath(object):
         with fiona.open(path, layer=layer) as c:
             assert len(c) == 67
 
-    def test_utf8_path(self):
-        path = self.dir + '/coutwildrnp.shp'
-        if sys.version_info < (3,):
-            with fiona.open(path) as c:
-                assert len(c) == 67
-
 
 class TestUnicodeStringField(object):
 

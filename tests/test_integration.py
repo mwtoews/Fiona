@@ -1,7 +1,6 @@
 """Unittests to verify Fiona is functioning properly with other software."""
 
-
-import six
+from collections import UserDict
 
 import fiona
 
@@ -11,10 +10,10 @@ def test_dict_subclass(tmpdir):
     `collections.UserDict()`.  Make sure we can receive it.
 
     `UserDict()` is a good class to test against because in Python 2 it is
-    not a subclass of `collections.Mapping()`, so it provides an edge case.
+    not a subclass of `collections.abc.Mapping()`, so it provides an edge case.
     """
 
-    class CRS(six.moves.UserDict):
+    class CRS(UserDict):
         pass
 
     outfile = str(tmpdir.join('test_UserDict.geojson'))

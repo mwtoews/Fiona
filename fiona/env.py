@@ -2,19 +2,18 @@
 
 from contextlib import contextmanager
 from functools import wraps, total_ordering
+from inspect import getfullargspec
 import logging
 import os
 import re
 import threading
 
 import attr
-from six import string_types
 
 from fiona._env import (
     GDALEnv, calc_gdal_version_num, get_gdal_version_num, get_gdal_config,
     set_gdal_config, get_gdal_release_name, GDALDataFinder, PROJDataFinder,
     set_proj_data_search_path)
-from fiona.compat import getargspec
 from fiona.errors import EnvError, GDALVersionError
 from fiona.session import Session, DummySession
 
@@ -451,7 +450,7 @@ class GDALVersion(object):
             return input
         if isinstance(input, tuple):
             return cls(*input)
-        elif isinstance(input, string_types):
+        elif isinstance(input, str):
             # Extract major and minor version components.
             # alpha, beta, rc suffixes ignored
             match = re.search(r'^\d+\.\d+', input)
@@ -551,7 +550,7 @@ def require_gdal_version(version, param=None, values=None, is_max_version=False,
                             inequality, str(version), reason))
 
                 # normalize args and kwds to dict
-                argspec = getargspec(f)
+                argspec = getfullargspec(f)
                 full_kwds = kwds.copy()
 
                 if argspec.args:

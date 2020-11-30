@@ -10,7 +10,7 @@ from fiona cimport _cpl, _crs, _csl, _geometry
 from fiona._crs cimport OGRSpatialReferenceH
 from fiona._shim cimport osr_set_traditional_axis_mapping_strategy
 
-from fiona.compat import UserDict
+from collections import UserDict
 
 
 cdef extern from "ogr_geometry.h" nogil:

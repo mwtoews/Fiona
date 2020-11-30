@@ -17,7 +17,6 @@ from fiona.env import env_ctx_if_needed
 from fiona.errors import FionaDeprecationWarning
 from fiona.drvsupport import supported_drivers
 from fiona.path import Path, vsi_path, parse_path
-from six import string_types, binary_type
 
 
 log = logging.getLogger(__name__)
@@ -53,26 +52,26 @@ class Collection(object):
         options.
         """
 
-        if not isinstance(path, (string_types, Path)):
+        if not isinstance(path, (str, Path)):
             raise TypeError("invalid path: %r" % path)
-        if not isinstance(mode, string_types) or mode not in ('r', 'w', 'a'):
+        if not isinstance(mode, str) or mode not in ('r', 'w', 'a'):
             raise TypeError("invalid mode: %r" % mode)
-        if driver and not isinstance(driver, string_types):
+        if driver and not isinstance(driver, str):
             raise TypeError("invalid driver: %r" % driver)
         if schema and not hasattr(schema, 'get'):
             raise TypeError("invalid schema: %r" % schema)
-        if crs and not isinstance(crs, compat.DICT_TYPES + string_types):
+        if crs and not isinstance(crs, (str,) + compat.DICT_TYPES):
             raise TypeError("invalid crs: %r" % crs)
-        if crs_wkt and not isinstance(crs_wkt, string_types):
+        if crs_wkt and not isinstance(crs_wkt, str):
             raise TypeError("invalid crs_wkt: %r" % crs_wkt)
-        if encoding and not isinstance(encoding, string_types):
+        if encoding and not isinstance(encoding, str):
             raise TypeError("invalid encoding: %r" % encoding)
-        if layer and not isinstance(layer, tuple(list(string_types) + [int])):
+        if layer and not isinstance(layer, (str, int)):
             raise TypeError("invalid name: %r" % layer)
         if vsi:
-            if not isinstance(vsi, string_types) or not vfs.valid_vsi(vsi):
+            if not isinstance(vsi, str) or not vfs.valid_vsi(vsi):
                 raise TypeError("invalid vsi: %r" % vsi)
-        if archive and not isinstance(archive, string_types):
+        if archive and not isinstance(archive, str):
             raise TypeError("invalid archive: %r" % archive)
 
         # Check GDAL version against drivers
@@ -101,7 +100,7 @@ class Collection(object):
             self.path = vsi_path(path)
 
         if mode == 'w':
-            if layer and not isinstance(layer, string_types):
+            if layer and not isinstance(layer, str):
                 raise ValueError("in 'w' mode, layer names must be strings")
             if driver == 'GeoJSON':
                 if layer is not None:
@@ -489,7 +488,7 @@ ALL_GEOMETRY_TYPES.add("None")
 def _get_valid_geom_types(schema, driver):
     """Returns a set of geometry types the schema will accept"""
     schema_geom_type = schema["geometry"]
-    if isinstance(schema_geom_type, string_types) or schema_geom_type is None:
+    if isinstance(schema_geom_type, str) or schema_geom_type is None:
         schema_geom_type = (schema_geom_type,)
     valid_types = set()
     for geom_type in schema_geom_type:
@@ -528,7 +527,7 @@ class BytesCollection(Collection):
         """Takes buffer of bytes whose contents is something we'd like
         to open with Fiona and maps it to a virtual file.
         """
-        if not isinstance(bytesbuf, binary_type):
+        if not isinstance(bytesbuf, bytes):
             raise ValueError("input buffer must be bytes")
 
         # Hold a reference to the buffer, as bad things will happen if

@@ -12,8 +12,6 @@ import math
 import uuid
 from collections import namedtuple, OrderedDict
 
-from six import integer_types, string_types, text_type
-
 from fiona._shim cimport *
 
 from fiona._geometry cimport (
@@ -220,7 +218,7 @@ cdef class FeatureBuilder:
             elif fieldtype is float:
                 props[key] = OGR_F_GetFieldAsDouble(feature, i)
 
-            elif fieldtype is text_type:
+            elif fieldtype is str:
                 val = OGR_F_GetFieldAsString(feature, i)
                 try:
                     val = val.decode(encoding)
@@ -348,7 +346,7 @@ cdef class OGRFeatureBuilder:
                 value = json.dumps(value)
 
             # Continue over the standard OGR types.
-            if isinstance(value, integer_types):
+            if isinstance(value, int):
                 if schema_type == 'int32':
                     OGR_F_SetFieldInteger(cogr_feature, i, value)
                 else:
@@ -356,7 +354,7 @@ cdef class OGRFeatureBuilder:
 
             elif isinstance(value, float):
                 OGR_F_SetFieldDouble(cogr_feature, i, value)
-            elif (isinstance(value, string_types)
+            elif (isinstance(value, str)
             and schema_type in ['date', 'time', 'datetime']):
                 if schema_type == 'date':
                     y, m, d, hh, mm, ss, ff = parse_date(value)
@@ -386,7 +384,7 @@ cdef class OGRFeatureBuilder:
                 string_c = value
                 OGR_F_SetFieldBinary(cogr_feature, i, len(value),
                     <unsigned char*>string_c)
-            elif isinstance(value, string_types):
+            elif isinstance(value, str):
                 value_bytes = strencode(value, encoding)
                 string_c = value_bytes
                 OGR_F_SetFieldString(cogr_feature, i, string_c)
@@ -466,7 +464,7 @@ cdef class Session:
 
         self.cogr_ds = gdal_open_vector(path_c, 0, drivers, kwargs)
 
-        if isinstance(collection.name, string_types):
+        if isinstance(collection.name, str):
             name_b = collection.name.encode('utf-8')
             name_c = name_b
             self.cogr_layer = GDALDatasetGetLayerByName(self.cogr_ds, name_c)
@@ -882,7 +880,7 @@ cdef class WritingSession(Session):
             try:
                 self.cogr_ds = gdal_open_vector(path_c, 1, None, kwargs)
 
-                if isinstance(collection.name, string_types):
+                if isinstance(collection.name, str):
                     name_b = collection.name.encode('utf-8')
                     name_c = name_b
                     self.cogr_layer = exc_wrap_pointer(GDALDatasetGetLayerByName(self.cogr_ds, name_c))
@@ -983,7 +981,7 @@ cdef class WritingSession(Session):
                 layer_names.append(name_b.decode('utf-8'))
 
             idx = -1
-            if isinstance(collection.name, string_types):
+            if isinstance(collection.name, str):
                 if collection.name in layer_names:
                     idx = layer_names.index(collection.name)
             elif isinstance(collection.name, int):
@@ -1017,7 +1015,7 @@ cdef class WritingSession(Session):
                 options = CSLAddNameValue(options, <const char *>k, <const char *>v)
 
             geometry_type = collection.schema.get("geometry", "Unknown")
-            if not isinstance(geometry_type, string_types) and geometry_type is not None:
+            if not isinstance(geometry_type, str) and geometry_type is not None:
                 geometry_types = set(geometry_type)
                 if len(geometry_types) > 1:
                     geometry_type = "Unknown"
@@ -1447,7 +1445,7 @@ def _remove_layer(path, layer, driver=None):
     cdef void *cogr_ds
     cdef int layer_index
 
-    if isinstance(layer, integer_types):
+    if isinstance(layer, int):
         layer_index = layer
         layer_str = str(layer_index)
     else:
@@ -1514,7 +1512,7 @@ def buffer_to_virtual_file(bytesbuf, ext=''):
     """
 
     vsi_filename = '/vsimem/{}'.format(uuid.uuid4().hex + ext)
-    vsi_cfilename = vsi_filename if not isinstance(vsi_filename, string_types) else vsi_filename.encode('utf-8')
+    vsi_cfilename = vsi_filename if not isinstance(vsi_filename, str) else vsi_filename.encode('utf-8')
 
     vsi_handle = VSIFileFromMemBuffer(vsi_cfilename, <unsigned char *>bytesbuf, len(bytesbuf), 0)
 
@@ -1527,7 +1525,7 @@ def buffer_to_virtual_file(bytesbuf, ext=''):
 
 
 def remove_virtual_file(vsi_filename):
-    vsi_cfilename = vsi_filename if not isinstance(vsi_filename, string_types) else vsi_filename.encode('utf-8')
+    vsi_cfilename = vsi_filename if not isinstance(vsi_filename, str) else vsi_filename.encode('utf-8')
     return VSIUnlink(vsi_cfilename)
 
 
